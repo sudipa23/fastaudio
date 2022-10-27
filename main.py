@@ -16,29 +16,48 @@ import shutil
 #create the app object
 app = FastAPI()
 
-#app.mount("/static", StaticFiles(directory="static"), name="static")
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
+'''
+@app.get("/images")
+def images():
+    out = []
+    for filename in os.listdir("static/images"):
+        out.append({
+            "name": filename.split(".")[0],
+            "path": "/static/images/" + filename
+        })
+    return out
+'''
 @app.post("/upload-file/")
 def create_upload_file(uploaded_file: UploadFile = File(...)):
     print("\n============================= Upload the Audio File ===============================\n")
-    file_location = f"files/{uploaded_file.filename}"
+    file_location = f"static/3gp/{uploaded_file.filename}"
+    print("THE UPLOADED AUDIO FILE NAME IS:",uploaded_file.filename)
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
     print("\n============================= Audio file Has Been Uploaded ===============================\n")
+    
     return {"file_name": uploaded_file.filename}
 #update file structure
-
 
 @app.get("/audio")
 def audio_preprocess():
     
     print("\n=============================== AUDIO ANALYSIS IS GOING ON ==========================================\n")
+    '''
     x = 'files'
     video_list = glob.glob(x+'/*.3gp')
     cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
     print(cleaned_mp4s)
     filename =cleaned_mp4s[0]
-  
+    '''
+    
+    x = 'static/3gp'
+    video_list = glob.glob(x+'/*.3gp')
+    cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
+    print(cleaned_mp4s)
+    filename =cleaned_mp4s[0]
+    
     sr = 16000
     n_fft = 4096
     len_hop = n_fft / 4
@@ -47,6 +66,13 @@ def audio_preprocess():
     audiofile_wave = filename.replace(file_extension, 'wav')
     file_handle = track.export(audiofile_wave, format='wav')
     print("\naudiofile_wave:",audiofile_wave)
+
+    x = 'static/wav'
+    wav_list = glob.glob(x+'/*.wav')
+    cleaned_mp3s = [files.replace("\\", "/") for files in wav_list]
+    print(cleaned_mp3s)
+    ch_filename =cleaned_mp3s[0]
+    Converted_wav_file = open(ch_filename, mode="rb")
     
     ####Speech-to-Text Trasnlation
     tiny = whisper.load_model("medium") #loading the medium whisper model by Open-AI
@@ -67,7 +93,7 @@ def audio_preprocess():
     print(result.text)
     #print(result.src)
     #print(result.dest)
-
+    
     ####Text-to-Speech Translation
     print("\n")
     print("The converted text to speech translation is going on...\n")
@@ -75,14 +101,18 @@ def audio_preprocess():
     language = 'hi'
     myobj = gTTS(text=mytext, lang=language, slow=False)
     # Saving the converted audio in a wav format
-    save = myobj.save("files/converted_hindi_audio.mp3")
+    save = myobj.save("static/converted_hindi_audio.mp3")
+    x= 'static'
     mp3_list = glob.glob(x+'/*.mp3')
     cleaned_mp3s = [files.replace("\\", "/") for files in mp3_list]
     print(cleaned_mp3s)
     ch_filename =cleaned_mp3s[0]
     Converted_hindi_audio_file = open(ch_filename, mode="rb")
+    
     print("\n=============================== AUDIO ANALYSING HAS FINISHED ==========================================\n")
     return StreamingResponse(Converted_hindi_audio_file , media_type="audio/mp3")
+    
+   
     #return input_str
 #run the API with uvicorn
 #it will run on http://127.0.0.1:8000
