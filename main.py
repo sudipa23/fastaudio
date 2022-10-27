@@ -19,16 +19,18 @@ app = FastAPI()
 #app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.post("/upload-file/")
-async def create_upload_file(uploaded_file: UploadFile = File(...)):
+def create_upload_file(uploaded_file: UploadFile = File(...)):
+    print("\n============================= Upload the Audio File ===============================\n")
     file_location = f"files/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
+    print("\n============================= Audio file Has Been Uploaded ===============================\n")
     return {"file_name": uploaded_file.filename}
 #update file structure
 x = 'files'
 
 @app.get("/audio")
-async def audio_preprocess():
+def audio_preprocess():
   print("\n=============================== AUDIO ANALYSIS IS GOING ON ==========================================\n")
   video_list = glob.glob(x+'/*.3gp')
   cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
