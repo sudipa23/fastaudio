@@ -75,7 +75,7 @@ def audio_preprocess():
     Converted_wav_file = open(ch_filename, mode="rb")
     
     ####Speech-to-Text Trasnlation
-    tiny = whisper.load_model("medium") #loading the medium whisper model by Open-AI
+    tiny = whisper.load_model("tiny") #loading the medium whisper model by Open-AI
     print("\n speech to text transcribing is ongoing...\n")
     result = tiny.transcribe(audiofile_wave)
     input_str = result["text"]
