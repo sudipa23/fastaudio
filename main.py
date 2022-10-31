@@ -39,18 +39,14 @@ def create_upload_file(uploaded_file: UploadFile = File(...)):
     
     return {"file_name": uploaded_file.filename}
 #update file structure
-
+'''
 @app.get("/audio")
 def audio_preprocess():
     
     print("\n=============================== AUDIO ANALYSIS IS GOING ON ==========================================\n")
-    '''
-    x = 'files'
-    video_list = glob.glob(x+'/*.3gp')
-    cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
-    print(cleaned_mp4s)
-    filename =cleaned_mp4s[0]
-    '''
+    
+    
+   
     
     x = 'static/3gp'
     video_list = glob.glob(x+'/*.3gp')
@@ -111,9 +107,9 @@ def audio_preprocess():
     
     print("\n=============================== AUDIO ANALYSING HAS FINISHED ==========================================\n")
     return StreamingResponse(Converted_hindi_audio_file , media_type="audio/mp3")
-    
+'''  
    
-    #return input_str
+    
 #run the API with uvicorn
 #it will run on http://127.0.0.1:8000
 if __name__ == '__main__':
