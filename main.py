@@ -3,7 +3,6 @@ import uvicorn
 from fastapi import FastAPI, File, UploadFile
 import numpy as np
 from pydub import AudioSegment
-import whisper
 import glob
 from googletrans import Translator
 from gtts import gTTS
