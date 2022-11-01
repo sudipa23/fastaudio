@@ -41,10 +41,6 @@ async def audio_preprocess():
   print("cleaned_mp4s:",cleaned_mp4s)
   filename =cleaned_mp4s[0]
   
-  #audio_file = open(filename, mode="rb")
-  #sr = 16000
-  #n_fft = 4096
-  #len_hop = n_fft / 4
   file_extension = '3gp'
   print("\n======================== 1. Converting the Audio to WAV format=============================\n")
   track = AudioSegment.from_file(filename, file_extension)
