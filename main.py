@@ -11,8 +11,6 @@ import speech_recognition as sr
 from fastapi.responses import StreamingResponse
 import shutil
 from fastapi.middleware.cors import CORSMiddleware
-import pyrebase
-import os
 
 #create the app object
 app = FastAPI()
@@ -26,48 +24,31 @@ app.add_middleware(
 )
 
 
-filelist = [f for f in os. listdir(".") if f.endswith(".3gp") ]
-for f in filelist:
-    os.remove(os.path.join(".", f))
-filelist = [f for f in os. listdir(".") if f.endswith(".wav") ]
-for f in filelist:
-    os.remove(os.path.join(".", f))
-filelist = [f for f in os. listdir(".") if f.endswith("mp3") ]
-for f in filelist:
-    os.remove(os.path.join(".", f))
-
-Config = {
-  "apiKey": "AIzaSyBoz31F2-e9dngWW2GYRavMFZgcnzJ2Y3Q",
-  "authDomain": "audioanalysis-project.firebaseapp.com",
-  "databaseURL": "",
-  "projectId": "audioanalysis-project",
-  "storageBucket": "audioanalysis-project.appspot.com",
-  "serviceAccount": "serviceAccountKey.json"
-}
-firebase_storage = pyrebase.initialize_app(Config)
-storage = firebase_storage.storage()
-
-#download audio from firebase
-#storage.child("Recording_2022_10_21_01_05_51.3gp").download(filename = "audio1.3gp")
-
-
-
 #Index route,open automatically on http://127.0.0.1:8000
+'''
+video_list = glob.glob('*.3gp')
+cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
+print(cleaned_mp4s)
+filename =cleaned_mp4s[0]
+'''
+
+@app.post("/upload")
+async def upload_audio(file: UploadFile):
+  print("\n======================== Upload the Audio File=============================\n")
+  with open(f'{file.filename}',"wb") as buffer:
+    shutil.copyfileobj(file.file, buffer)
+  print("\n======================== Audio File has Uploaded=============================\n")
+  print("the audio file name is : ",file.filename)
+  return {"file_name": file.filename}
+
 
 @app.get("/audio")
 async def audio_preprocess():
-  #download all files from firebase
-  all_files = storage.list_files()
-  temp = []
-  for file in all_files:
-      file.download_to_filename(file.name)
-      temp.append(file.name)
-  print("list printing:",temp)
-  curr_elem = temp[-1]
-  print("the current element is:",curr_elem) 
-
-  filename = curr_elem
   print("\n======================== Audio Analysis has startred=============================\n")
+  video_list = glob.glob('*.3gp')
+  cleaned_mp4s = [files.replace("\\", "/") for files in video_list]
+  print("cleaned_mp4s:",cleaned_mp4s)
+  filename =cleaned_mp4s[0]
   
   file_extension = '3gp'
   print("\n======================== 1. Converting the Audio to WAV format=============================\n")
@@ -121,8 +102,6 @@ async def audio_preprocess():
   print(cleaned_mp3s)
   ch_filename =cleaned_mp3s[0]
   Converted_hindi_audio_file = open(ch_filename, mode="rb")
-  #upload file to firebase storage
-  storage.child("converted_hindi_audio.mp3").put("converted_hindi_audio.mp3")
   return StreamingResponse(Converted_hindi_audio_file , media_type="audio/mp3")
   
 #run the API with uvicorn
