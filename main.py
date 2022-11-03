@@ -51,21 +51,22 @@ storage = firebase_storage.storage()
 #storage.child("Recording_2022_10_21_01_05_51.3gp").download(filename = "audio1.3gp")
 
 
-#download all files from firebase
-all_files = storage.list_files()
-temp = []
-for file in all_files:
-    file.download_to_filename(file.name)
-    temp.append(file.name)
-print("list printing:",temp)
-curr_elem = temp[-1]
-print("the current element is:",curr_elem) 
 
-filename = curr_elem
 #Index route,open automatically on http://127.0.0.1:8000
 
 @app.get("/audio")
 async def audio_preprocess():
+  #download all files from firebase
+  all_files = storage.list_files()
+  temp = []
+  for file in all_files:
+      file.download_to_filename(file.name)
+      temp.append(file.name)
+  print("list printing:",temp)
+  curr_elem = temp[-1]
+  print("the current element is:",curr_elem) 
+
+  filename = curr_elem
   print("\n======================== Audio Analysis has startred=============================\n")
   
   file_extension = '3gp'
